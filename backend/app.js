@@ -26,7 +26,7 @@ app.use('/api/projects', projectRoutes);
 
 // Serve the main frontend page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
 // Serve dashboard page
