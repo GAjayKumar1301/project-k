@@ -24,29 +24,44 @@ const projectController = {
                 });
             }
 
-            const searchTerm = searchQuery.trim().toLowerCase();
+            const searchTerm = searchQuery.trim();
             
-            // Find exact character matches
+            // Calculate similarity for all titles
+            const similarityResult = calculateSimilarity(searchTerm, projectTitles);
+            
+            // Find exact character matches with similarity percentage
             const exactMatches = projectTitles.filter(project => 
-                project.title.toLowerCase().includes(searchTerm)
-            ).map(project => ({
-                title: project.title,
-                submittedBy: project.submittedBy,
-                dateSubmitted: project.dateSubmitted
-            }));
+                project.title.toLowerCase().includes(searchTerm.toLowerCase())
+            ).map(project => {
+                // Find the similarity for this project
+                const similarityData = similarityResult.allResults.find(result => 
+                    result.title === project.title
+                );
+                return {
+                    title: project.title,
+                    submittedBy: project.submittedBy,
+                    dateSubmitted: project.dateSubmitted,
+                    similarity: similarityData ? similarityData.similarity : 0
+                };
+            }).sort((a, b) => b.similarity - a.similarity); // Sort by similarity descending
 
-            // Get all titles for display
-            const allMatches = projectTitles.map(project => ({
-                title: project.title,
-                submittedBy: project.submittedBy,
-                dateSubmitted: project.dateSubmitted
-            })).slice(0, 20); // Limit to 20 results
+            // Get all titles with similarity scores, sorted by similarity
+            const allMatches = similarityResult.allResults
+                .slice(0, 20) // Limit to 20 results
+                .map(result => ({
+                    title: result.title,
+                    submittedBy: result.submittedBy,
+                    dateSubmitted: result.dateSubmitted,
+                    similarity: result.similarity
+                }));
             
             res.status(200).json({
                 searchQuery: searchQuery.trim(),
                 exactMatches: exactMatches,
                 allMatches: allMatches,
                 totalProjects: projectTitles.length,
+                bestMatch: similarityResult.bestMatch,
+                highestSimilarity: similarityResult.similarity,
                 timestamp: new Date().toISOString()
             });
         } catch (error) {
@@ -88,16 +103,35 @@ const projectController = {
         const { title, submittedBy } = req.body;
 
         try {
-            // Check for exact duplicate
-            const existingTitle = await ProjectTitle.findOne({ 
+            // Get all existing titles to check for similarity
+            const existingTitles = await ProjectTitle.find({});
+            
+            // Check for exact duplicate first
+            const exactDuplicate = await ProjectTitle.findOne({ 
                 title: { $regex: new RegExp(`^${title.trim()}$`, 'i') }
             });
             
-            if (existingTitle) {
+            if (exactDuplicate) {
                 return res.status(400).json({
                     message: 'This exact title already exists',
-                    status: 'duplicate'
+                    status: 'duplicate',
+                    similarity: 100
                 });
+            }
+
+            // Calculate similarity with existing titles
+            if (existingTitles.length > 0) {
+                const similarityResult = calculateSimilarity(title.trim(), existingTitles);
+                
+                // If highest similarity is above 80%, reject the submission
+                if (similarityResult.similarity >= 80) {
+                    return res.status(400).json({
+                        message: `Title is too similar to existing project: "${similarityResult.bestMatch}" (${similarityResult.similarity}% similarity)`,
+                        status: 'high_similarity',
+                        similarity: similarityResult.similarity,
+                        similarTitle: similarityResult.bestMatch
+                    });
+                }
             }
 
             const newTitle = new ProjectTitle({

@@ -232,6 +232,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const noMatchesSection = document.getElementById('noMatches');
         const searchTermDisplay = document.getElementById('searchTermDisplay');
         
+        // Show similarity summary if available
+        if (data.bestMatch && data.highestSimilarity) {
+            const similaritySummary = document.createElement('div');
+            similaritySummary.className = 'alert alert-info border-0 mb-3';
+            let alertClass = 'alert-info';
+            if (data.highestSimilarity >= 80) alertClass = 'alert-danger';
+            else if (data.highestSimilarity >= 50) alertClass = 'alert-warning';
+            else alertClass = 'alert-success';
+            
+            similaritySummary.className = `alert ${alertClass} border-0 mb-3`;
+            similaritySummary.innerHTML = `
+                <i class="fas fa-chart-line me-2"></i>
+                <strong>Highest Similarity:</strong> ${data.highestSimilarity}% with "${data.bestMatch}"
+            `;
+            
+            // Insert before search results
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.insertBefore(similaritySummary, resultsContainer.firstChild);
+        }
+        
         // Check if we have any exact matches
         if (exactMatches.length > 0) {
             exactMatchesList.innerHTML = '';
@@ -283,20 +303,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createMatchItem(match, isExact) {
         const matchItem = document.createElement('div');
-        matchItem.className = 'match-item';
-        
+        matchItem.className = 'match-item d-flex flex-column flex-md-row align-items-md-center justify-content-between py-2 px-3 mb-2 border rounded shadow-sm';
+
         const date = new Date(match.dateSubmitted).toLocaleDateString();
-        
+
+        // Similarity percentage badge
+        let similarityBadge = '';
+        if (typeof match.similarity === 'number') {
+            let badgeClass = 'bg-secondary';
+            if (match.similarity >= 80) badgeClass = 'bg-success';
+            else if (match.similarity >= 50) badgeClass = 'bg-warning text-dark';
+            else badgeClass = 'bg-danger';
+            similarityBadge = `<span class="badge ${badgeClass} ms-2">Similarity: ${match.similarity.toFixed(1)}%</span>`;
+        }
+
         matchItem.innerHTML = `
-            <div class="match-title">${match.title}</div>
-            <div class="match-meta">
+            <div class="match-title fw-semibold text-primary">${match.title}</div>
+            <div class="match-meta small text-muted mt-1 mt-md-0">
                 <i class="fas fa-user me-1"></i>Submitted by: ${match.submittedBy}
                 <span class="mx-2">•</span>
                 <i class="fas fa-calendar me-1"></i>Date: ${date}
+                ${similarityBadge}
                 ${isExact ? '<span class="badge bg-success ms-2">Exact Match</span>' : ''}
             </div>
         `;
-        
         return matchItem;
     }
 
@@ -340,6 +370,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('projectTitle').value = '';
                 } else {
                     if (data.status === 'duplicate') {
+                        titleError.innerHTML = `
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            ${data.message}
+                            <span class="badge bg-danger ms-2">100% Match</span>
+                        `;
+                        titleError.style.display = 'block';
+                    } else if (data.status === 'high_similarity') {
+                        titleError.innerHTML = `
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            ${data.message}
+                            <span class="badge bg-warning text-dark ms-2">${data.similarity}% Similar</span>
+                        `;
+                        titleError.style.display = 'block';
+                    } else {
                         titleError.textContent = data.message;
                         titleError.style.display = 'block';
                     }
