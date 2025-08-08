@@ -3,8 +3,19 @@ const API_BASE_URL = '/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is logged in
-    const user = localStorage.getItem('user');
-    if (!user) {
+    const userInfo = localStorage.getItem('userInfo');
+    const token = localStorage.getItem('token');
+    
+    if (!userInfo || !token) {
+        window.location.href = '/';
+        return;
+    }
+
+    // Parse user info
+    const user = JSON.parse(userInfo);
+    
+    // Check if user is a student
+    if (user.userType !== 'Student') {
         window.location.href = '/';
         return;
     }
@@ -123,7 +134,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchSuggestions(query) {
         try {
-            const response = await fetch(`${API_BASE_URL}/projects/suggestions?query=${encodeURIComponent(query)}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/projects/suggestions?query=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await response.json();
             
             if (response.ok) {
@@ -192,10 +208,12 @@ document.addEventListener('DOMContentLoaded', function() {
         hideSuggestions();
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/projects/search`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ searchQuery: searchTerm })
             });
@@ -338,7 +356,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const title = document.getElementById('projectTitle').value.trim();
             const titleError = document.getElementById('titleError');
-            const userData = JSON.parse(localStorage.getItem('user'));
+            const userData = JSON.parse(localStorage.getItem('userInfo'));
+            const token = localStorage.getItem('token');
+            
+            if (!userData || !token) {
+                showCustomAlert("You must be logged in to submit a title.", 'warning');
+                window.location.href = '/';
+                return;
+            }
             
             if (title === '') {
                 showCustomAlert("Project title cannot be empty.", 'warning');
@@ -354,7 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const response = await fetch(`${API_BASE_URL}/projects/submit-title`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ 
                         title: title,
@@ -402,7 +428,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadStats() {
     try {
-        const response = await fetch(`${API_BASE_URL}/projects/titles`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/projects/titles`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const titles = await response.json();
         
         if (response.ok) {
@@ -421,8 +452,8 @@ async function loadStats() {
 
 // Global functions
 function logout() {
-    localStorage.removeItem('user');
-    localStorage.removeItem('userType');
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
     window.location.href = '/';
 }
 

@@ -1,78 +1,132 @@
 const mongoose = require('mongoose');
-const ProjectTitle = require('./models/ProjectTitle');
+const Project = require('./models/ProjectTitle');
 const User = require('./models/User');
 
-// Sample project titles
-const sampleTitles = [
-    "A Study on Machine Learning Algorithms for Text Classification",
-    "Development of a Web-Based Student Information System", 
-    "An Analysis of Network Security Protocols in IoT Devices",
-    "Design and Implementation of a Real-Time Chat Application",
-    "Investigating the Impact of Social Media on Mental Health",
-    "Optimizing Data Structures for Large Scale Applications",
-    "Blockchain Technology and Its Applications in Supply Chain",
-    "Predictive Modeling for Customer Churn in E-commerce",
-    "Automated System for Smart Home Management",
-    "Deep Learning Approaches for Image Recognition"
-];
-
-// Sample users
+// Sample users with complete information
 const sampleUsers = [
-    { email: 'admin@college.edu', password: 'admin123', userType: 'Admin' },
-    { email: 'staff@college.edu', password: 'staff123', userType: 'Staff' },
-    { email: 'student@college.edu', password: 'student123', userType: 'Student' },
-    { email: 'john.doe@college.edu', password: 'password123', userType: 'Student' },
+    {
+        name: 'Admin User',
+        email: 'admin@college.edu',
+        password: 'admin123',
+        userType: 'Admin',
+        department: 'Administration',
+        staffId: 'ADM001'
+    },
+    {
+        name: 'Dr. Sarah Johnson',
+        email: 'staff@college.edu',
+        password: 'staff123',
+        userType: 'Staff',
+        department: 'Computer Science',
+        staffId: 'CSE001'
+    },
+    {
+        name: 'Student One',
+        email: 'student@college.edu',
+        password: 'student123',
+        userType: 'Student',
+        department: 'Computer Science',
+        studentId: 'CS2023001',
+        academicYear: '2023-2024'
+    },
+    {
+        name: 'John Doe',
+        email: 'john.doe@college.edu',
+        password: 'password123',
+        userType: 'Student',
+        department: 'Computer Science',
+        studentId: 'CS2023002',
+        academicYear: '2023-2024'
+    }
 ];
 
+// Sample projects with proper details
+const sampleProjects = [
+    {
+        title: "Machine Learning for Text Classification",
+        description: "This project aims to implement and compare various machine learning algorithms for text classification tasks. The study will focus on preprocessing techniques, feature engineering, and model evaluation metrics.",
+        tags: ['Machine Learning', 'NLP', 'Classification']
+    },
+    {
+        title: "Smart Home Automation System",
+        description: "Development of an IoT-based smart home automation system that allows users to control home appliances remotely. Includes features for energy monitoring and automated scheduling.",
+        tags: ['IoT', 'Automation', 'Embedded Systems']
+    },
+    {
+        title: "Blockchain-based Supply Chain Management",
+        description: "Implementation of a blockchain solution for supply chain transparency and traceability. Focuses on product authentication and real-time tracking capabilities.",
+        tags: ['Blockchain', 'Supply Chain', 'Web3']
+    }
+];
+
+// Seed the database
 async function seedDatabase() {
     try {
         // Connect to MongoDB
-        await mongoose.connect('mongodb://localhost:27017/ProjectManagement', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-
+        await mongoose.connect('mongodb://localhost:27017/ProjectManagement');
         console.log('Connected to MongoDB');
 
         // Clear existing data
-        await ProjectTitle.deleteMany({});
+        await Project.deleteMany({});
         await User.deleteMany({});
         console.log('Cleared existing data');
 
-        // Insert sample users
+        // Create users and store them by type for reference
+        const createdUsers = {};
         for (const userData of sampleUsers) {
-            const existingUser = await User.findOne({ email: userData.email });
-            if (!existingUser) {
-                await User.create(userData);
-                console.log(`Created user: ${userData.email}`);
+            try {
+                const user = await User.create(userData);
+                // Store user by type for easy reference
+                createdUsers[userData.userType.toLowerCase()] = user;
+                console.log(`Created user: ${userData.email} (${userData.userType})`);
+            } catch (error) {
+                console.error(`Error creating user ${userData.email}:`, error.message);
             }
         }
 
-        // Insert sample project titles
-        for (const title of sampleTitles) {
-            const existingTitle = await ProjectTitle.findOne({ title });
-            if (!existingTitle) {
-                await ProjectTitle.create({
-                    title,
-                    submittedBy: 'sample@college.edu'
+        // Create projects with proper references
+        for (const projectData of sampleProjects) {
+            try {
+                const student = createdUsers.student;
+                const staff = createdUsers.staff;
+
+                if (!student || !staff) {
+                    throw new Error('Required users not found in database');
+                }
+
+                const project = await Project.create({
+                    ...projectData,
+                    studentId: student._id,
+                    guide: staff._id,
+                    department: 'Computer Science',
+                    academicYear: '2023-2024',
+                    visibility: 'department',
+                    status: 'pending',
+                    reviews: [{
+                        reviewType: 'title',
+                        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                        status: 'pending'
+                    }]
                 });
-                console.log(`Created project title: ${title}`);
+                console.log(`Created project: ${project.title}`);
+            } catch (error) {
+                console.error(`Error creating project ${projectData.title}:`, error.message);
             }
         }
 
-        console.log('✅ Database seeded successfully!');
+        console.log('\n✅ Database seeded successfully!');
         console.log('\n🔐 Login Credentials:');
-        console.log('Admin: admin@college.edu / admin123');
-        console.log('Staff: staff@college.edu / staff123'); 
+        console.log('Admin:   admin@college.edu / admin123');
+        console.log('Staff:   staff@college.edu / staff123');
         console.log('Student: student@college.edu / student123');
-        
+
     } catch (error) {
-        console.error('❌ Error seeding database:', error);
+        console.error('❌ Error seeding database:', error.message);
     } finally {
         await mongoose.connection.close();
-        console.log('Database connection closed');
+        console.log('\nDatabase connection closed');
     }
 }
 
-// Run the seed function
+// Run the seeding process
 seedDatabase();

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/projectController');
+const { auth, authorize } = require('../middleware/auth');
 
 // GET /api/projects - List all available endpoints
-router.get('/', (req, res) => {
+router.get('/', auth, (req, res) => {
     res.status(200).json({
         message: 'Project API endpoints',
         endpoints: {
@@ -16,15 +17,15 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/projects/suggestions
-router.get('/suggestions', projectController.getSuggestions);
+router.get('/suggestions', auth, projectController.getSuggestions);
 
 // POST /api/projects/search
-router.post('/search', projectController.searchTitle);
+router.post('/search', auth, projectController.searchTitle);
 
-// POST /api/projects/submit-title
-router.post('/submit-title', projectController.submitTitle);
+// POST /api/projects/submit-title - Only students can submit titles
+router.post('/submit-title', auth, authorize('Student'), projectController.submitTitle);
 
 // GET /api/projects/titles
-router.get('/titles', projectController.getAllTitles);
+router.get('/titles', auth, projectController.getAllTitles);
 
 module.exports = router;

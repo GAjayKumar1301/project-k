@@ -17,22 +17,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from frontend directory
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
-
-// Serve the main frontend page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/login.html'));
-});
-
-// Serve dashboard page
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/dashboard.html'));
-});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -43,7 +30,58 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Error handling middleware (should be last)
-app.use(errorHandler);
+// Frontend routes
+const frontendPath = path.join(__dirname, '../frontend');
+
+// Serve static files
+app.use(express.static(frontendPath));
+
+// Main routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'login.html'));
+});
+
+// Dashboard routes
+app.get('/pages/student/dashboard', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/student/dashboard.html'));
+});
+
+app.get('/pages/student/home', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/student/home.html'));
+});
+
+app.get('/pages/staff/dashboard', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/staff/dashboard.html'));
+});
+
+app.get('/pages/admin/dashboard', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/admin/dashboard.html'));
+});
+
+// Handle HTML file requests
+app.get('/*.html', (req, res, next) => {
+    const filePath = path.join(frontendPath, req.path);
+    res.sendFile(filePath, err => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                next(); // Pass to 404 handler
+            } else {
+                next(err); // Pass other errors to error handler
+            }
+        }
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(frontendPath, '404.html'), err => {
+        if (err) {
+            res.status(404).send('Page not found');
+        }
+    });
+});
+
+// Error handling middleware
+app.use(errorHandler.globalErrorHandler);
 
 module.exports = app;

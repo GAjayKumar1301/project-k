@@ -1,0 +1,152 @@
+/* Global Variables */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f1c40f;
+    --dark-color: #2c3e50;
+}
+
+/* Base Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Loader */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Navigation Bar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Main Content */
+main {
+    flex: 1;
+}
+
+.content-section {
+    display: none;
+    padding: 2rem 0;
+}
+
+.content-section.active {
+    display: block;
+}
+
+/* Welcome Section */
+.welcome-section {
+    background: linear-gradient(rgba(52, 152, 219, 0.9), rgba(46, 204, 113, 0.9)), url('../../assets/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 6rem 0;
+    text-align: center;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Project Search */
+.progress {
+    height: 1.5rem;
+    border-radius: 1rem;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate {
+    animation: fadeIn 1s ease;
+}
+
+/* File Upload */
+.file-upload-wrapper {
+    border: 2px dashed var(--primary-color);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.file-upload-wrapper:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.file-upload-input {
+    display: none;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 0.5rem;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+footer a:hover {
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 4rem 0;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
