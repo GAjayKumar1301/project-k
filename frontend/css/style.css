@@ -1,0 +1,143 @@
+/* Main styles from the original style.css */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #d1d8db;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 1200px;
+    height: 80vh;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.left-section {
+    flex: 1;
+    background: linear-gradient(to bottom right, rgb(113, 173, 194), rgb(141, 128, 193));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+}
+
+.info h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.info p {
+    font-size: 1.2rem;
+}
+
+.right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+#initial-options h2, #form-title {
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #4a4a4a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.option-btn:hover {
+    background: #9b9da0;
+}
+
+#login-form-container {
+    width: 100%;
+}
+
+#login-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#login-form input {
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1.5px solid black;
+    border-radius: 10px;
+    background: white;
+    color: black;
+    font-size: 1rem;
+}
+
+#login-form input::placeholder {
+    color: #aaa;
+}
+
+.submit-btn {
+    padding: 15px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 20px;
+    color: #00aaff;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}
+
+#message {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+#message.success {
+    color: green;
+}
+
+#message.error {
+    color: red;
+}
