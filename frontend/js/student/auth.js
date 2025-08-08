@@ -22,8 +22,13 @@ class Auth {
 
     async checkAuthStatus() {
         const token = localStorage.getItem('token');
+        const isHomePage = window.location.pathname.endsWith('/home.html');
+        
         if (!token) {
-            this.redirectToLogin();
+            // Only redirect to login if we're not on the home page
+            if (!isHomePage) {
+                this.redirectToLogin();
+            }
             return;
         }
 
@@ -56,7 +61,10 @@ class Auth {
 
         } catch (error) {
             console.error('Auth check failed:', error);
-            this.redirectToLogin();
+            // Only redirect to login if we're not on the home page
+            if (!window.location.pathname.endsWith('/home.html')) {
+                this.redirectToLogin();
+            }
         }
     }
 

@@ -116,4 +116,10 @@ userSchema.methods.toJSON = function() {
     return userObject;
 };
 
+// Check if password has expired
+userSchema.methods.isPasswordExpired = function() {
+    // By default, no password expiration
+    return false;
+};
+
 module.exports = mongoose.model('User', userSchema);
