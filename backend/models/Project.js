@@ -5,12 +5,23 @@ const reviewStageSchema = new mongoose.Schema({
     stageNumber: {
         type: Number,
         required: true,
-        enum: [0, 1, 2, 3], // 0: Title, 1: Review 1, 2: Review 2, 3: Final Paper
+        enum: [0, 1, 2, 3], // 0: Title, 1: Initial Proposal, 2: Progress Report, 3: Complete Submission
     },
     stageName: {
         type: String,
         required: true,
-        enum: ['Title Submission', 'Review 1', 'Review 2', 'Final Paper']
+        enum: ['Project Title Submission', 'Initial Proposal', 'Progress Report', 'Complete Submission']
+    },
+    stageDescription: {
+        type: String,
+        required: true
+    },
+    requiredFields: [{
+        type: String
+    }],
+    icon: {
+        type: String,
+        default: 'fas fa-file'
     },
     status: {
         type: String,
@@ -220,27 +231,39 @@ projectSchema.methods.initializeReviewStages = function() {
     const stages = [
         {
             stageNumber: 0,
-            stageName: 'Title Submission',
+            stageName: 'Project Title Submission',
+            stageDescription: 'Submit your project title for approval',
             status: 'available', // First stage is available immediately
-            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+            requiredFields: ['title', 'description'],
+            icon: 'fas fa-heading'
         },
         {
             stageNumber: 1,
-            stageName: 'Review 1',
+            stageName: 'Initial Proposal',
+            stageDescription: 'Submit your detailed project proposal',
             status: 'locked',
-            dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000) // 21 days from now
+            dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
+            requiredFields: ['title', 'description', 'methodology', 'objectives'],
+            icon: 'fas fa-file-alt'
         },
         {
             stageNumber: 2,
-            stageName: 'Review 2',
+            stageName: 'Progress Report',
+            stageDescription: 'Submit your project progress report',
             status: 'locked',
-            dueDate: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000) // 35 days from now
+            dueDate: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000), // 35 days from now
+            requiredFields: ['progressDescription', 'completedWork', 'challenges', 'nextSteps'],
+            icon: 'fas fa-chart-line'
         },
         {
             stageNumber: 3,
-            stageName: 'Final Paper',
+            stageName: 'Complete Submission',
+            stageDescription: 'Submit your final project documentation',
             status: 'locked',
-            dueDate: new Date(Date.now() + 49 * 24 * 60 * 60 * 1000) // 49 days from now
+            dueDate: new Date(Date.now() + 49 * 24 * 60 * 60 * 1000), // 49 days from now
+            requiredFields: ['finalReport', 'sourceCode', 'documentation'],
+            icon: 'fas fa-file-pdf'
         }
     ];
     

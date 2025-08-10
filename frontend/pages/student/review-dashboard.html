@@ -144,30 +144,42 @@
         <!-- Progress Overview -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="progress-container">
+                <div class="review-header">
+                    <h2 class="mb-3">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        Project 1 Review
+                    </h2>
+                    <p class="mb-0 opacity-75">Follow the sequential review process for your project submission</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Tracking -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="review-progress">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h3 class="mb-2">
-                                <i class="fas fa-rocket me-2"></i>
-                                Project Progress
-                            </h3>
-                            <p class="mb-3 opacity-75">Track your project submission stages</p>
-                            <div class="progress" style="height: 10px;">
-                                <div id="overallProgress" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                            <h5 class="mb-2" style="color: white;">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Progress Tracking
+                            </h5>
+                            <div class="progress mb-2" style="height: 12px;">
+                                <div id="overallProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
                             </div>
-                            <small class="mt-2 d-block opacity-75">
-                                <span id="progressText">Get started by submitting your project title</span>
+                            <small class="d-block" style="color: rgba(255,255,255,0.8);">
+                                <span id="progressText">Start with Review 0 - Project Title Submission</span>
                             </small>
                         </div>
                         <div class="col-md-4 text-end">
                             <div class="d-flex justify-content-end">
                                 <div class="text-center me-4">
-                                    <h2 class="mb-0" id="currentStageNumber">0</h2>
-                                    <small>Current Stage</small>
+                                    <h3 class="mb-0" id="currentStageNumber" style="color: white;">0</h3>
+                                    <small style="color: rgba(255,255,255,0.8);">Current Stage</small>
                                 </div>
                                 <div class="text-center">
-                                    <h2 class="mb-0" id="progressPercentage">0%</h2>
-                                    <small>Complete</small>
+                                    <h3 class="mb-0" id="progressPercentage" style="color: white;">0%</h3>
+                                    <small style="color: rgba(255,255,255,0.8);">Complete</small>
                                 </div>
                             </div>
                         </div>
@@ -178,12 +190,13 @@
 
         <!-- Review Stages Section -->
         <section id="review-section">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-12">
-                    <h4 class="mb-4">
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        Review Stages
+                    <h4 class="mb-0" style="color: white;">
+                        <i class="fas fa-list-ol me-2"></i>
+                        Review Sequence
                     </h4>
+                    <p class="text-muted mt-2">Complete each stage in order to progress through your project review</p>
                 </div>
             </div>
             

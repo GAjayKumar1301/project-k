@@ -205,6 +205,14 @@ function createStageCard(stage, index) {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-3 mb-4';
 
+    // Define stage-specific icons and colors based on the image sequence
+    const stageConfigs = {
+        0: { icon: 'fas fa-heading', name: 'Review 0', subtitle: 'Title Submission', color: '#007bff' },
+        1: { icon: 'fas fa-file-alt', name: 'Review 1', subtitle: 'Initial Proposal', color: '#6c757d' },
+        2: { icon: 'fas fa-chart-line', name: 'Review 2', subtitle: 'Progress Report', color: '#6c757d' },
+        3: { icon: 'fas fa-file-pdf', name: 'Final Paper', subtitle: 'Complete Submission', color: '#6c757d' }
+    };
+
     const statusIcons = {
         'locked': 'fas fa-lock text-secondary',
         'available': 'fas fa-play-circle text-success',
@@ -214,9 +222,9 @@ function createStageCard(stage, index) {
 
     const statusColors = {
         'locked': '#6c757d',
-        'available': '#28a745',
+        'available': '#007bff',
         'submitted': '#ffc107',
-        'completed': '#007bff'
+        'completed': '#28a745'
     };
 
     const statusTexts = {
@@ -226,45 +234,53 @@ function createStageCard(stage, index) {
         'completed': 'Completed'
     };
 
+    const config = stageConfigs[stage.stageNumber] || stageConfigs[0];
+    const cardColor = stage.status === 'available' ? config.color : statusColors[stage.status];
     const dueDate = stage.dueDate ? new Date(stage.dueDate).toLocaleDateString() : 'No due date';
     const submittedDate = stage.submission?.submittedAt ? 
         new Date(stage.submission.submittedAt).toLocaleDateString() : null;
 
+    const isActive = stage.status === 'available';
+    const cardClass = isActive ? 'review-stage-card active-stage' : 'review-stage-card';
+
     col.innerHTML = `
-        <div class="card review-stage-card ${stage.status}" onclick="handleStageClick(${stage.stageNumber}, '${stage.status}')">
-            <div class="stage-indicator" style="background-color: ${statusColors[stage.status]}">
-                ${stage.stageNumber}
-            </div>
-            <div class="card-body">
-                <h6 class="card-title d-flex align-items-center">
-                    <i class="${statusIcons[stage.status]} me-2"></i>
-                    ${stage.stageName}
-                </h6>
-                <p class="card-text">
-                    <small class="text-muted">Status: ${statusTexts[stage.status]}</small>
-                </p>
+        <div class="card ${cardClass}" onclick="handleStageClick(${stage.stageNumber}, '${stage.status}')" 
+             style="border: 2px solid ${cardColor}; ${isActive ? 'box-shadow: 0 4px 15px rgba(0,123,255,0.3);' : ''}">
+            <div class="card-body text-center">
+                <div class="stage-icon mb-3" style="color: ${cardColor};">
+                    <i class="${config.icon}" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="card-title" style="color: ${cardColor};">${config.name}</h5>
+                <h6 class="card-subtitle mb-3 text-muted">${config.subtitle}</h6>
+                
+                <div class="status-badge mb-3">
+                    <span class="badge" style="background-color: ${cardColor}; color: white;">
+                        <i class="${statusIcons[stage.status]} me-1"></i>
+                        ${statusTexts[stage.status]}
+                    </span>
+                </div>
                 
                 ${stage.submission?.title ? `
-                    <div class="mb-2">
-                        <strong>Title:</strong>
-                        <div class="text-muted small">${stage.submission.title}</div>
+                    <div class="mb-2 text-start">
+                        <strong>Project Title:</strong>
+                        <div class="text-muted small mt-1">${stage.submission.title}</div>
                     </div>
                 ` : ''}
                 
-                <div class="mt-auto">
-                    <div class="small text-muted">
+                <div class="stage-details text-start">
+                    <div class="small text-muted mb-1">
                         <i class="fas fa-calendar me-1"></i>
                         Due: ${dueDate}
                     </div>
                     ${submittedDate ? `
-                        <div class="small text-success">
+                        <div class="small text-success mb-1">
                             <i class="fas fa-check me-1"></i>
                             Submitted: ${submittedDate}
                         </div>
                     ` : ''}
                     
                     ${stage.feedback?.grade ? `
-                        <div class="small text-primary mt-1">
+                        <div class="small text-primary">
                             <i class="fas fa-star me-1"></i>
                             Grade: ${stage.feedback.grade}%
                         </div>
@@ -272,23 +288,23 @@ function createStageCard(stage, index) {
                 </div>
                 
                 ${stage.status === 'available' ? `
-                    <button class="btn btn-sm btn-success mt-2 w-100">
+                    <button class="btn btn-primary mt-3 w-100" style="background-color: ${cardColor}; border-color: ${cardColor};">
                         <i class="fas fa-upload me-1"></i>
-                        Submit Now
+                        Submit ${config.name}
                     </button>
                 ` : ''}
                 
                 ${stage.status === 'submitted' ? `
-                    <div class="alert alert-warning mt-2 mb-0 small">
+                    <div class="alert alert-warning mt-3 mb-0 small">
                         <i class="fas fa-hourglass-half me-1"></i>
-                        Waiting for review
+                        Under Review
                     </div>
                 ` : ''}
                 
-                ${stage.status === 'completed' && stage.feedback ? `
-                    <div class="alert alert-success mt-2 mb-0 small">
-                        <i class="fas fa-thumbs-up me-1"></i>
-                        Approved
+                ${stage.status === 'completed' ? `
+                    <div class="alert alert-success mt-3 mb-0 small">
+                        <i class="fas fa-check-circle me-1"></i>
+                        Completed
                     </div>
                 ` : ''}
             </div>
