@@ -44,10 +44,10 @@ const authController = {
                 name,
                 email: email.toLowerCase(),
                 password,
-                role,
+                userType: role, // Fix: use userType instead of role
                 department,
-                ...(role === 'student' && { studentId, academicYear }),
-                ...(role === 'staff' && { staffId })
+                ...(role === 'Student' && { studentId, academicYear }),
+                ...(role === 'Staff' && { staffId })
             });
 
             const token = await user.generateAuthToken(req.get('User-Agent'));

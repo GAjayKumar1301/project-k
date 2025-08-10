@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const Project = require('./models/ProjectTitle');
 const User = require('./models/User');
+const Project = require('./models/Project');
+const ProjectTitle = require('./models/ProjectTitle');
 
 // Sample users with complete information
 const sampleUsers = [
@@ -9,8 +10,7 @@ const sampleUsers = [
         email: 'admin@college.edu',
         password: 'admin123',
         userType: 'Admin',
-        department: 'Administration',
-        staffId: 'ADM001'
+        department: 'Administration'
     },
     {
         name: 'Dr. Sarah Johnson',
@@ -21,13 +21,21 @@ const sampleUsers = [
         staffId: 'CSE001'
     },
     {
+        name: 'Dr. Michael Chen',
+        email: 'chen@college.edu',
+        password: 'staff123',
+        userType: 'Staff',
+        department: 'Computer Science',
+        staffId: 'CSE002'
+    },
+    {
         name: 'Student One',
         email: 'student@college.edu',
         password: 'student123',
         userType: 'Student',
         department: 'Computer Science',
-        studentId: 'CS2023001',
-        academicYear: '2023-2024'
+        studentId: 'CS2024001',
+        academicYear: '2024-2025'
     },
     {
         name: 'John Doe',
@@ -35,27 +43,46 @@ const sampleUsers = [
         password: 'password123',
         userType: 'Student',
         department: 'Computer Science',
-        studentId: 'CS2023002',
-        academicYear: '2023-2024'
+        studentId: 'CS2024002',
+        academicYear: '2024-2025'
+    },
+    {
+        name: 'Jane Smith',
+        email: 'jane.smith@college.edu',
+        password: 'password123',
+        userType: 'Student',
+        department: 'Computer Science',
+        studentId: 'CS2024003',
+        academicYear: '2024-2025'
     }
 ];
 
-// Sample projects with proper details
-const sampleProjects = [
+// Sample legacy project titles for backward compatibility
+const sampleTitles = [
     {
-        title: "Machine Learning for Text Classification",
-        description: "This project aims to implement and compare various machine learning algorithms for text classification tasks. The study will focus on preprocessing techniques, feature engineering, and model evaluation metrics.",
-        tags: ['Machine Learning', 'NLP', 'Classification']
+        title: "Machine Learning for Text Classification in Social Media Posts",
+        submittedBy: "student@college.edu",
+        department: "Computer Science"
     },
     {
-        title: "Smart Home Automation System",
-        description: "Development of an IoT-based smart home automation system that allows users to control home appliances remotely. Includes features for energy monitoring and automated scheduling.",
-        tags: ['IoT', 'Automation', 'Embedded Systems']
+        title: "Smart Home Automation System using IoT and Machine Learning",
+        submittedBy: "john.doe@college.edu",
+        department: "Computer Science"
     },
     {
-        title: "Blockchain-based Supply Chain Management",
-        description: "Implementation of a blockchain solution for supply chain transparency and traceability. Focuses on product authentication and real-time tracking capabilities.",
-        tags: ['Blockchain', 'Supply Chain', 'Web3']
+        title: "Blockchain-based Supply Chain Management for Agricultural Products",
+        submittedBy: "jane.smith@college.edu",
+        department: "Computer Science"
+    },
+    {
+        title: "Real-time Web Application for Student Project Management",
+        submittedBy: "student@college.edu",
+        department: "Computer Science"
+    },
+    {
+        title: "Computer Vision System for Automated Quality Control in Manufacturing",
+        submittedBy: "john.doe@college.edu",
+        department: "Computer Science"
     }
 ];
 
@@ -63,70 +90,115 @@ const sampleProjects = [
 async function seedDatabase() {
     try {
         // Connect to MongoDB
-        await mongoose.connect('mongodb://localhost:27017/ProjectManagement');
+        const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/project_management';
+        await mongoose.connect(mongoURI);
         console.log('Connected to MongoDB');
 
         // Clear existing data
-        await Project.deleteMany({});
+        console.log('Clearing existing data...');
         await User.deleteMany({});
-        console.log('Cleared existing data');
+        await Project.deleteMany({});
+        await ProjectTitle.deleteMany({});
+        console.log('✅ Cleared existing data');
 
-        // Create users and store them by type for reference
+        // Create users
+        console.log('\n📝 Creating users...');
         const createdUsers = {};
         for (const userData of sampleUsers) {
             try {
-                const user = await User.create(userData);
-                // Store user by type for easy reference
-                createdUsers[userData.userType.toLowerCase()] = user;
-                console.log(`Created user: ${userData.email} (${userData.userType})`);
+                const user = new User(userData);
+                await user.save();
+                createdUsers[userData.email] = user;
+                console.log(`✅ Created user: ${userData.email} (${userData.userType})`);
             } catch (error) {
-                console.error(`Error creating user ${userData.email}:`, error.message);
+                console.error(`❌ Error creating user ${userData.email}:`, error.message);
             }
         }
 
-        // Create projects with proper references
-        for (const projectData of sampleProjects) {
+        // Create legacy project titles
+        console.log('\n📚 Creating legacy project titles...');
+        for (const titleData of sampleTitles) {
             try {
-                const student = createdUsers.student;
-                const staff = createdUsers.staff;
-
-                if (!student || !staff) {
-                    throw new Error('Required users not found in database');
-                }
-
-                const project = await Project.create({
-                    ...projectData,
-                    studentId: student._id,
-                    guide: staff._id,
-                    department: 'Computer Science',
-                    academicYear: '2023-2024',
-                    visibility: 'department',
-                    status: 'pending',
-                    reviews: [{
-                        reviewType: 'title',
-                        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                        status: 'pending'
-                    }]
-                });
-                console.log(`Created project: ${project.title}`);
+                await ProjectTitle.create(titleData);
+                console.log(`✅ Created project title: ${titleData.title.substring(0, 50)}...`);
             } catch (error) {
-                console.error(`Error creating project ${projectData.title}:`, error.message);
+                console.error(`❌ Error creating title:`, error.message);
             }
         }
 
-        console.log('\n✅ Database seeded successfully!');
-        console.log('\n🔐 Login Credentials:');
-        console.log('Admin:   admin@college.edu / admin123');
-        console.log('Staff:   staff@college.edu / staff123');
-        console.log('Student: student@college.edu / student123');
+        // Create sample projects with sequential review system
+        console.log('\n🚀 Creating sample projects...');
+        const studentUser = createdUsers['student@college.edu'];
+        const johnUser = createdUsers['john.doe@college.edu'];
+        const staffUser = createdUsers['staff@college.edu'];
+
+        if (studentUser && staffUser) {
+            // Create a project for the main student with title already submitted
+            const project1 = await Project.createForStudent(
+                studentUser._id, 
+                'Computer Science', 
+                '2024-2025'
+            );
+            
+            // Submit title for this project
+            await project1.submitReviewStage(0, {
+                title: "AI-Powered Student Performance Analytics Dashboard",
+                description: "A comprehensive web application that uses machine learning algorithms to analyze student performance patterns and provide predictive insights for academic success."
+            });
+            
+            console.log(`✅ Created project with submitted title for: ${studentUser.email}`);
+            
+            // Create another project for John that's further along
+            if (johnUser) {
+                const project2 = await Project.createForStudent(
+                    johnUser._id,
+                    'Computer Science',
+                    '2024-2025'
+                );
+                
+                // Submit title
+                await project2.submitReviewStage(0, {
+                    title: "Distributed Cloud Storage System with End-to-End Encryption",
+                    description: "A secure, scalable cloud storage solution with advanced encryption, file versioning, and real-time synchronization capabilities."
+                });
+                
+                // Approve title to unlock Review 1
+                await project2.approveReviewStage(0, {
+                    comment: "Excellent project proposal. Title is unique and technically sound.",
+                    grade: 85,
+                    reviewerId: staffUser._id
+                });
+                
+                console.log(`✅ Created advanced project for: ${johnUser.email}`);
+            }
+        }
+
+        console.log('\n🎉 Database seeded successfully!');
+        console.log('\n🔐 Test Login Credentials:');
+        console.log('┌─────────────────────────────────────────┐');
+        console.log('│ Admin:   admin@college.edu / admin123   │');
+        console.log('│ Staff:   staff@college.edu / staff123   │');
+        console.log('│ Student: student@college.edu / student123│');
+        console.log('└─────────────────────────────────────────┘');
+        
+        console.log('\n📊 Created Data Summary:');
+        console.log(`👥 Users: ${sampleUsers.length}`);
+        console.log(`📚 Legacy Titles: ${sampleTitles.length}`);
+        console.log(`🚀 Projects: 2 (with different review stages)`);
 
     } catch (error) {
-        console.error('❌ Error seeding database:', error.message);
+        console.error('❌ Error seeding database:', error);
+        console.error('Full error:', error.stack);
     } finally {
         await mongoose.connection.close();
-        console.log('\nDatabase connection closed');
+        console.log('\n🔌 Database connection closed');
+        process.exit(0);
     }
 }
 
 // Run the seeding process
-seedDatabase();
+if (require.main === module) {
+    seedDatabase();
+}
+
+module.exports = seedDatabase;

@@ -13,32 +13,52 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg fixed-top" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
         <div class="container-fluid">
-            <span class="navbar-brand">Project Review Portal</span>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="/student/dashboard">
+                <i class="fas fa-rocket me-2" style="color: #f093fb;"></i>Project Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" data-section="home">Home</a>
+                        <a class="nav-link" href="/student/home">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-section="dashboard">Dashboard</a>
+                        <a class="nav-link active" href="/student/dashboard">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-section="about">About Us</a>
+                        <a class="nav-link" href="/student/reviews">
+                            <i class="fas fa-tasks me-1"></i>Reviews
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" onclick="showAboutSection(event)">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <img src="../../assets/Profile_avatar.jpg" class="avatar me-2" alt="User Avatar">student
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="../../assets/Profile_avatar.jpg" class="avatar me-2" alt="User Avatar">
+                            <span id="studentDisplayName">Student</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-graduation-cap me-2"></i>Grades</a></li>
+                            <li><a class="dropdown-item" href="#profile" onclick="showProfileSection(event)">
+                                <i class="fas fa-user me-2"></i>Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="#grades" onclick="showGradesSection(event)">
+                                <i class="fas fa-graduation-cap me-2"></i>Grades
+                            </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="#logout" onclick="logout(event)">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
                         </ul>
                     </li>
                 </ul>
@@ -47,7 +67,7 @@
     </nav>
 
     <!-- Main Content Area -->
-    <div id="main-content" class="container-fluid">
+    <div id="main-content" class="container-fluid" style="padding-top: 100px;">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="content-section active">
             <!-- Hero Section -->
@@ -55,10 +75,10 @@
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-8">
-                            <h1 class="display-5 fw-bold text-primary mb-3">
-                                <i class="fas fa-rocket me-3"></i>Project Dashboard
+                            <h1 class="display-5 fw-bold mb-3" style="color: white;">
+                                <i class="fas fa-rocket me-3" style="color: #f093fb;"></i>Project Dashboard
                             </h1>
-                            <p class="lead text-muted mb-4">
+                            <p class="lead mb-4" style="color: rgba(255, 255, 255, 0.8);">
                                 Search for project titles, check similarity, and submit your unique project ideas.
                             </p>
                         </div>
@@ -66,12 +86,12 @@
                             <div class="stats-card">
                                 <div class="row text-center">
                                     <div class="col-6">
-                                        <h3 class="text-primary mb-0" id="totalProjects">--</h3>
-                                        <small class="text-muted">Total Projects</small>
+                                        <h3 class="mb-0" id="totalProjects">--</h3>
+                                        <small style="color: rgba(255, 255, 255, 0.7);">Total Projects</small>
                                     </div>
                                     <div class="col-6">
-                                        <h3 class="text-success mb-0" id="uniqueProjects">--</h3>
-                                        <small class="text-muted">Unique Titles</small>
+                                        <h3 class="mb-0" id="uniqueProjects">--</h3>
+                                        <small style="color: rgba(255, 255, 255, 0.7);">Unique Titles</small>
                                     </div>
                                 </div>
                             </div>

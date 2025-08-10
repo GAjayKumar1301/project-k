@@ -19,14 +19,11 @@ const auth = async (req, res, next) => {
             const decoded = jwt.verify(token, JWT_SECRET);
             
             // Find user
-            const user = await User.findById(decoded._id)
-                .select('-password -resetPasswordToken -resetPasswordExpires');
+            const user = await User.findById(decoded._id);
             
             if (!user) {
                 return errorHandler.handleError(res, 'User not found', 401);
             }
-
-            // Status check removed as it's not part of our user model
 
             // Check if token is in user's tokens array
             const tokenExists = user.tokens.find(t => t.token === token);
@@ -42,8 +39,15 @@ const auth = async (req, res, next) => {
                 return errorHandler.handleError(res, 'Token has expired', 401);
             }
 
+            // Remove sensitive data before adding to request
+            const userForRequest = user.toObject();
+            delete userForRequest.password;
+            delete userForRequest.tokens;
+            delete userForRequest.resetPasswordToken;
+            delete userForRequest.resetPasswordExpires;
+            
             // Add user and token to request
-            req.user = user;
+            req.user = { ...userForRequest, userId: user._id };
             req.token = token;
             next();
         } catch (error) {

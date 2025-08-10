@@ -41,35 +41,77 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(frontendPath, 'login.html'));
 });
 
-// Dashboard routes
-app.get('/pages/student/dashboard', (req, res) => {
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'login.html'));
+});
+
+// Clean Student Routes (without /pages/)
+app.get('/student/dashboard', (req, res) => {
     res.sendFile(path.join(frontendPath, 'pages/student/dashboard.html'));
 });
 
-app.get('/pages/student/home', (req, res) => {
+app.get('/student/reviews', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/student/review-dashboard.html'));
+});
+
+app.get('/student/home', (req, res) => {
     res.sendFile(path.join(frontendPath, 'pages/student/home.html'));
 });
 
-app.get('/pages/staff/dashboard', (req, res) => {
+// Clean Staff Routes (without /pages/)
+app.get('/staff/dashboard', (req, res) => {
     res.sendFile(path.join(frontendPath, 'pages/staff/dashboard.html'));
 });
 
-app.get('/pages/admin/dashboard', (req, res) => {
+app.get('/staff/reviews', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/staff/review-dashboard.html'));
+});
+
+app.get('/staff/home', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/staff/home.html'));
+});
+
+// Clean Admin Routes (without /pages/)
+app.get('/admin/dashboard', (req, res) => {
     res.sendFile(path.join(frontendPath, 'pages/admin/dashboard.html'));
 });
 
-// Handle HTML file requests
-app.get('/*.html', (req, res, next) => {
-    const filePath = path.join(frontendPath, req.path);
-    res.sendFile(filePath, err => {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                next(); // Pass to 404 handler
-            } else {
-                next(err); // Pass other errors to error handler
-            }
-        }
-    });
+app.get('/admin/users', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/admin/users.html'));
+});
+
+app.get('/admin/home', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'pages/admin/home.html'));
+});
+
+// Legacy routes for backward compatibility (redirect to clean URLs)
+app.get('/pages/student/dashboard', (req, res) => {
+    res.redirect(301, '/student/dashboard');
+});
+
+app.get('/pages/student/review-dashboard', (req, res) => {
+    res.redirect(301, '/student/reviews');
+});
+
+app.get('/pages/student/home', (req, res) => {
+    res.redirect(301, '/student/home');
+});
+
+app.get('/pages/staff/dashboard', (req, res) => {
+    res.redirect(301, '/staff/dashboard');
+});
+
+app.get('/pages/admin/dashboard', (req, res) => {
+    res.redirect(301, '/admin/dashboard');
+});
+
+// Direct HTML file access (for development)
+app.get('/login.html', (req, res) => {
+    res.redirect(301, '/login');
+});
+
+app.get('/404.html', (req, res) => {
+    res.sendFile(path.join(frontendPath, '404.html'));
 });
 
 // 404 handler

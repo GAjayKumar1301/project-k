@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
     
     if (!userInfo || !token) {
-        window.location.href = '/';
+        window.location.href = '/login';
         return;
     }
 
@@ -16,8 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check if user is a student
     if (user.userType !== 'Student') {
-        window.location.href = '/';
+        window.location.href = '/login';
         return;
+    }
+
+    // Update student name in navbar
+    const studentNameElement = document.getElementById('studentDisplayName');
+    if (studentNameElement) {
+        studentNameElement.textContent = user.name || 'Student';
     }
 
     // DOM Elements
@@ -361,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!userData || !token) {
                 showCustomAlert("You must be logged in to submit a title.", 'warning');
-                window.location.href = '/';
+                window.location.href = '/login';
                 return;
             }
             
@@ -454,10 +460,61 @@ async function loadStats() {
 function logout() {
     localStorage.removeItem('userInfo');
     localStorage.removeItem('token');
-    window.location.href = '/';
+    window.location.href = '/login';
 }
 
 function clearForm() {
     document.getElementById('projectTitle').value = '';
     document.getElementById('titleError').style.display = 'none';
+}
+
+// Navbar function handlers
+function showAboutSection(event) {
+    if (event) event.preventDefault();
+    // Create about modal or section
+    showCustomAlert(`
+        <h5>About Project Management System</h5>
+        <p>This system helps students manage their project titles and review process efficiently.</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>Project title similarity checking</li>
+            <li>Sequential review system</li>
+            <li>Real-time search and suggestions</li>
+            <li>Progress tracking and analytics</li>
+        </ul>
+        <p><strong>Version:</strong> 2.0.0</p>
+    `, 'info');
+}
+
+function showProfileSection(event) {
+    if (event) event.preventDefault();
+    const userData = JSON.parse(localStorage.getItem('userInfo'));
+    if (!userData) return;
+    
+    showCustomAlert(`
+        <h5>Student Profile</h5>
+        <p><strong>Name:</strong> ${userData.name}</p>
+        <p><strong>Email:</strong> ${userData.email}</p>
+        <p><strong>Department:</strong> ${userData.department}</p>
+        <p><strong>Student ID:</strong> ${userData.studentId || 'N/A'}</p>
+        <p><strong>Academic Year:</strong> ${userData.academicYear || 'N/A'}</p>
+        <p><strong>User Type:</strong> ${userData.userType}</p>
+    `, 'info');
+}
+
+function showGradesSection(event) {
+    if (event) event.preventDefault();
+    showCustomAlert(`
+        <h5>Academic Grades</h5>
+        <p>Grade information will be available once your project reviews are completed.</p>
+        <p><strong>Current Status:</strong> In Progress</p>
+        <p><em>Contact your supervisor for detailed grade information.</em></p>
+    `, 'info');
+}
+
+function logout(event) {
+    if (event) event.preventDefault();
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
+    window.location.href = '/login';
 }
